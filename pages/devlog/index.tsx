@@ -1,6 +1,6 @@
 import { getAllPosts } from '../../lib/posts'
 import NextLink from 'next/link'
-import { Container, Heading, List, ListItem, Text, Button } from '@chakra-ui/react'
+import { Container, Heading, SimpleGrid, Box, Text, Button } from '@chakra-ui/react'
 
 export const getStaticProps = () => {
   const posts = getAllPosts()
@@ -8,26 +8,26 @@ export const getStaticProps = () => {
 }
 
 export default function BlogIndex({ posts }) {
-  return (
-    <Container maxW="container.md" py={8}>
-      <Heading mb={6}>Dev log</Heading>
-      {posts.length === 0 ? (
-        <Text>No logs posts yet.</Text>
-      ) : (
-        <List spacing={4}>
+    return (
+      <Container maxW="container.lg" py={8}>
+        <Heading mb={6}>Dev log</Heading>
+  
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
           {posts.map((post, i) => (
-            <ListItem key={i}>
+            <Box key={i} p={4} borderWidth={1} borderRadius="md" boxShadow="md">
               <NextLink href={`/devlog${post.slug}`} passHref>
-                <Button variant="link" colorScheme="teal">
+                <Button variant="link" colorScheme="teal" fontSize="lg">
                   {post.title}
                 </Button>
               </NextLink>
-              <Text fontSize="sm" color="gray.500">{post.date}</Text>
+              <Text fontSize="sm" color="gray.500">
+                {post.date}
+              </Text>
               <Text>{post.summary}</Text>
-            </ListItem>
+            </Box>
           ))}
-        </List>
-      )}
-    </Container>
-  )
-}
+        </SimpleGrid>
+      </Container>
+    )
+  }
+  
