@@ -83,6 +83,9 @@ const Navbar = props => {
           <LinkItem href="/posts" path={path}>
             Posts
           </LinkItem>
+          <LinkItem href="/devlog" path={path}>
+            dev log
+          </LinkItem>
           <LinkItem
             target="_blank"
             href="https://github.com/lcwoo/homepage"
@@ -114,6 +117,9 @@ const Navbar = props => {
                 </MenuItem>
                 <MenuItem as={MenuLink} href="/posts">
                   posts
+                </MenuItem>
+                <MenuItem as={MenuLink} href="/devlog">
+                  dev log
                 </MenuItem>
 
                 <MenuItem
