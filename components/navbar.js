@@ -78,13 +78,13 @@ const Navbar = props => {
           mt={{ base: 4, md: 0 }}
         >
           <LinkItem href="/publications" path={path}>
-            publications
+            Publications
           </LinkItem>
           <LinkItem href="/posts" path={path}>
             Posts
           </LinkItem>
           <LinkItem href="/devlog" path={path}>
-            dev log
+            Dev log
           </LinkItem>
           <LinkItem
             target="_blank"
@@ -119,7 +119,7 @@ const Navbar = props => {
                   posts
                 </MenuItem>
                 <MenuItem as={MenuLink} href="/devlog">
-                  dev log
+                  Dev log
                 </MenuItem>
 
                 <MenuItem

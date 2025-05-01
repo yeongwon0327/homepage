@@ -10,7 +10,7 @@ export const getStaticProps = () => {
 export default function BlogIndex({ posts }) {
   return (
     <Container maxW="container.md" py={8}>
-      <Heading mb={6}>devlog</Heading>
+      <Heading mb={6}>Dev log</Heading>
       {posts.length === 0 ? (
         <Text>No logs posts yet.</Text>
       ) : (
