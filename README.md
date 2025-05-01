@@ -37,7 +37,7 @@ MIT License.
 
 You can create your own homepage for free without notifying me by forking this project under the following conditions:
 
-- Add a link to [my homepage](https://lcwoo.github.io/homepage/), [changwoonchoi's homepage](https://github.com/changwoonchoi/homepage3d) and [Takuya's wensite](https://www.craftz.dog/)
+- Add a link to [my homepage](https://lcwoo.github.io/homepage/), and [Takuya's wensite](https://www.craftz.dog/)
 - Do not use the 3d model
 
 Check out [LICENSE](./LICENSE) for more detail.

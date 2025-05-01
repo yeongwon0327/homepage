@@ -38,7 +38,7 @@ const Scene = () => {
     const scH = container.clientHeight
 
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: false,
       alpha: true,
     })
     renderer.setPixelRatio(window.devicePixelRatio)
@@ -86,8 +86,8 @@ const Scene = () => {
       receiveShadow: false,
       castShadow: false,
     }).then(() => {
-      animate()
       setLoading(false)
+      animate()
     })
 
     let req = null
@@ -97,7 +97,7 @@ const Scene = () => {
 
       frame = frame <= 100 ? frame + 1 : frame
 
-      if (frame <= 100) {
+      if (frame <= 50) {
         const p = initialCameraPosition
         const rotSpeed = -easeOutCirc(frame / 120) * Math.PI * 20
 
