@@ -1,3 +1,4 @@
+import 'katex/dist/katex.min.css'
 import Layout from '../components/layouts/main'
 import Fonts from '../components/fonts'
 import { AnimatePresence } from 'framer-motion'
