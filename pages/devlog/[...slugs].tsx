@@ -11,6 +11,7 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import NextImage from 'next/image'
+import PdfViewer from '../../components/PdfViewer'
 
 const components = {
   // Headings
@@ -63,7 +64,7 @@ const components = {
       alt={props.alt || ''}
     />
   ),
-
+  PdfViewer,
   Box
 }
 
