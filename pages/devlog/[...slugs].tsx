@@ -13,6 +13,8 @@ import 'katex/dist/katex.min.css'
 import NextImage from 'next/image'
 import PdfViewer from '../../components/PdfViewer'
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+
 const components = {
   // Headings
   h1: (props: any) => <Heading as="h1" size="2xl" my={6} {...props} />,
@@ -47,26 +49,36 @@ const components = {
   th: Th,
   td: Td,
 
-  // Images
-  img: (props: any) => (
-    <NextImage
-      {...props}
-      width={props.width ? parseInt(props.width) : 800}
-      height={props.height ? parseInt(props.height) : 450}
-      alt={props.alt || ''}
-    />
-  ),
-  Image: (props: any) => (
-    <NextImage
-      {...props}
-      width={props.width ? parseInt(props.width) : 800}
-      height={props.height ? parseInt(props.height) : 450}
-      alt={props.alt || ''}
-    />
-  ),
+  // ✅ Images with basePath prepended if not external
+  img: (props: any) => {
+    const src = props.src?.startsWith('http') ? props.src : `${basePath}${props.src}`
+    return (
+      <NextImage
+        {...props}
+        src={src}
+        width={props.width ? parseInt(props.width) : 800}
+        height={props.height ? parseInt(props.height) : 450}
+        alt={props.alt || ''}
+      />
+    )
+  },
+  Image: (props: any) => {
+    const src = props.src?.startsWith('http') ? props.src : `${basePath}${props.src}`
+    return (
+      <NextImage
+        {...props}
+        src={src}
+        width={props.width ? parseInt(props.width) : 800}
+        height={props.height ? parseInt(props.height) : 450}
+        alt={props.alt || ''}
+      />
+    )
+  },
+
   PdfViewer,
-  Box
+  Box,
 }
+
 
 type BlogPostProps = {
   source: MDXRemoteSerializeResult

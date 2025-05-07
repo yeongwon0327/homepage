@@ -8,5 +8,6 @@ module.exports = {
     unoptimized: true
   },
   basePath: isProd ? '/homepage' : '',
-  assetPrefix: isProd ? '/homepage/' : ''
+  assetPrefix: isProd ? '/homepage/' : '',
+  trailingSlash: true,
 };
