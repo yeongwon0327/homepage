@@ -71,12 +71,12 @@ const Scene = () => {
     const ambientLight = new THREE.AmbientLight(0xffe0aa, 3.5)
     scene.add(ambientLight)
 
-    const spotLight = new THREE.SpotLight(0x64c7ff, 4)
-    spotLight.position.set(10, 20, 10)
-    spotLight.angle = Math.PI / 6
-    spotLight.penumbra = 0.2
-    spotLight.castShadow = true
-    scene.add(spotLight)
+    // const spotLight = new THREE.SpotLight(0x64c7ff, 4)
+    // spotLight.position.set(10, 20, 10)
+    // spotLight.angle = Math.PI / 6
+    // spotLight.penumbra = 0.2
+    // spotLight.castShadow = true
+    // scene.add(spotLight)
 
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.autoRotate = true

@@ -12,6 +12,7 @@ import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import NextImage from 'next/image'
 import PdfViewer from '../../components/PdfViewer'
+import remarkGfm from 'remark-gfm'
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
 
@@ -109,7 +110,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const mdxSource = await serialize(content, {
     mdxOptions: {
-      remarkPlugins: [remarkMath],
+      remarkPlugins: [remarkMath, remarkGfm],
       rehypePlugins: [rehypeKatex],
     },
   })
