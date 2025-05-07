@@ -33,4 +33,12 @@ function Website({ Component, pageProps, router }) {
   )
 }
 
+Website.getInitialProps = async ({ ctx }) => {
+  return {
+    pageProps: {
+      cookies: ctx.req?.headers.cookie ?? ''
+    }
+  }
+}
+
 export default Website
