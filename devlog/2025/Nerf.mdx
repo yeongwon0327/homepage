@@ -114,14 +114,14 @@ $$
 NeRF 구현의 첫 단계는 각 이미지에 대한 camera pose와 intrinsic parameter를 복원하는 일입니다. 이를 위해 Structure-from-Motion(SfM) 기반 오픈소스 도구인 COLMAP을 사용하며, 이는 이미지 간 feature를 자동으로 매칭하고 bundle adjustment를 통해 카메라의 회전 행렬 $R$, 이동 벡터 $t$, 내부 파라미터, 그리고 sparse 3D point cloud까지 추정합니다.  
 COLMAP이 제공하는 포즈는 world-to-camera 변환 행렬로 주어지며, 이는 다음과 같은 변환식을 따릅니다:
 $$
-\mathbb{\x_cam} = R \dot \mathbb{x_world} + t
+\mathbf{x}_{\text{cam}} = R \cdot \mathbf{x}_{\text{world}} + t
 $$
 하지만 NeRF는 각 픽셀에서 ray를 쏘기 위해, camera-to-world (C2W) 형식의 변환이 필요합니다. 이를 위해:
 회전 행렬 $R$을 전치시켜 방향을 반전하고,
 
 카메라의 world 위치(origin)를 아래와 같이 계산합니다:
 $$
-\mathbb{o} = - R^T \dot t	​
+\mathbf{o} = - R^{\top} \cdot t
 $$
 최종적으로 회전 및 이동을 조합한 4×4 C2W 행렬을 구성하여 **transforms_train.json**에 저장합니다.
 
