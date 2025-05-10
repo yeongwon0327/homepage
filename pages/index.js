@@ -183,7 +183,7 @@ const Home = () => {
       </BioSection>
 
       <BioSection>
-        <BioYear>2020.07 – 2022.01</BioYear>
+        <BioYear>2021.04 – 2022.01</BioYear>
         Squad Leader, ROK Army, (Logistics Command)
       </BioSection>
 

@@ -12,6 +12,7 @@ import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import NextImage from 'next/image'
 import PdfViewer from '../../components/PdfViewer'
+import HighlightText from '../../components/HighlightText'
 import remarkGfm from 'remark-gfm'
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
@@ -78,6 +79,7 @@ const components = {
 
   PdfViewer,
   Box,
+  HighlightText,
 }
 
 
@@ -125,7 +127,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
 export default function BlogPost({ source, frontMatter }: BlogPostProps) {
   return (
-    <Container maxW="container.md" py={8}>
+    <Container maxW="container.xl" py={8}>
       <Heading as="h1" size="2xl" mb={2}>{frontMatter.title}</Heading>
       <Text mb={6} color="gray.500">{frontMatter.date}</Text>
       <MDXRemote {...source} components={components} />
