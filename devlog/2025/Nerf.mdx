@@ -74,7 +74,7 @@ summary: "paper review"
 - <HighlightText lightColor="cyan.700" darkColor="#8be9fd">Positional Encoding을 통해 고주파 세부 표현 학습 가능</HighlightText>
 - <HighlightText lightColor="cyan.700" darkColor="#8be9fd">Hierarchical Sampling으로 효율적인 학습 구조 구현</HighlightText>
 
-
+###
 ---
 
 ## 2. NeRF의 동작 메커니즘: 전체 파이프라인 분석
@@ -102,11 +102,9 @@ NeRF는 이 두 출력을 하나의 다층 퍼셉트론(MLP)을 통해 예측합
 
 ### (d) Rendering Loss
 렌더링된 색상 $\hat{C}(r)$과 ground truth 간의 $L_2$ loss를 최소화하며 MLP 파라미터 $\Theta$를 학습합니다.
-
 $$
 \mathcal{L} = \sum_r \| \hat{C}(r) - C^*(r) \|^2
 $$
-
 즉, 카메라 포즈와 함께 주어진 실제 이미지에서 각 픽셀에 대응되는 ray를 따라 볼륨 렌더링을 수행한 후, **예측된 픽셀 색상 $\hat{C}(r)$**과 실제 색상 $C^*(r)$ 간의 차이를 계산하고, 이 오차가 작아지도록 MLP를 학습하는 방식입니다.
 
   또한 NeRF는 단일 네트워크만 사용하는 것이 아니라, coarse network와 fine network 두 단계의 MLP를 사용하여, 먼저 전체 영역을 대략적으로 예측한 뒤 중요한 구간을 더 정밀하게 샘플링합니다. 이로써 학습 효율성과 표현 정밀도를 동시에 달성할 수 있습니다.
@@ -124,15 +122,15 @@ COLMAP의 포즈는 world-to-camera 형식이며, 이를 camera-to-world로 변�
 
 $$
 \mathbf{o} = - R^{\top} \cdot t
-$$ 
+$$
 
-ray 방향을 계산하기 위해서는 픽셀 좌표 (u,v)를 카메라 내부 파라미터를 기반으로 정규화해야 하며 아래 식처럼 표현이 됩니다.
+ray 방향을 계산하기 위해서는 픽셀 좌표 \((u,v)\)를 카메라 내부 파라미터를 기반으로 정규화해야 하며 아래 식처럼 표현이 됩니다.
 
 $$
 \left( \frac{u - c_x}{f_x}, \frac{v - c_y}{f_y}, 1 \right)
-$$ 
+$$
 
-이후 \( R_{\text{cw}} \)로 world 좌표계 방향으로 변환하고, 단위 벡터로 정규화하여 사용합니다.
+이후 $R_{\text{cw}}$로 world 좌표계 방향으로 변환하고, 단위 벡터로 정규화하여 사용합니다.  
 이러한 정보는 모두 `transforms_train.json`에 저장되며, 학습 시 참조됩니다. COLMAP이 생성한 sparse point cloud는 학습에는 사용되지 않지만, 시각화 및 scene bounds 설정에 참고됩니다.
 
 ---
@@ -220,9 +218,7 @@ $$
 NeRF의 이 볼륨 렌더링 수식은 물리적 모델링 관점 외에도, 확률적 기대값의 형태로 해석할 수 있다는 점에서 매우 흥미롭습니다. $\sigma(t)$를 "위치 $t$에 물체가 존재할 확률 밀도", $T(t)$를 "해당 위치까지 ray가 살아남을 생존 확률", 그리고 $c(t, \mathbf{d})$를 "조건부 색상"이라고 해석한다면, 전체 적분은 다음과 같은 확률 가중 평균 형태로 볼 수 있습니다:
 
 $$
-C(r) = \mathbb{E}_{t \sim p(t)}[c(t)] =
-\int p(t) \cdot c(t) \, dt,
-\quad \text{where } p(t) = T(t) \cdot \sigma(t)
+C(r) = \mathbb{E}_{t \sim p(t)}[c(t)] = \int p(t) \cdot c(t) \, dt, \quad \text{where } p(t) = T(t) \cdot \sigma(t)
 $$
 
 $p(t)$는 ray 상의 각 지점 $t$에서 색상이 관측될 확률 밀도 함수입니다. 따라서 NeRF가 수행하는 색상 예측은 물리적 누적이 아니라 확률 분포 상에서의 기대값 계산 즉 확률적으로 가중된 평균 색상을 추정하는 것이라고 볼 수 있습니다.
@@ -280,7 +276,7 @@ RGB를 출력합니다. 이처럼 시점 정보는 late-fusion 방식으로 적�
 
 <Image src="/images/paper-review/NeRF/lambertian_effect.png" width={800} height={450} alt="..." />
 
-
+###
 ---
 
 ### 6. Hierarchical Sampling (Coarse → Fine)
@@ -292,10 +288,10 @@ NeRF는 3차원 장면을 2차원 이미지로 렌더링하기 위해, 각 픽�
 
 #### 2차 샘플링의 핵심: Importance Sampling의 통계적 직관
 
-이제 coarse에서 얻은 weight를 정규화하여 확률 밀도 함수(PDF)를 구성하고, 이를 누적하여 누적 분포 함수(CDF)를 만듭니다. 그다음에는 이 CDF를 활용해 밀도가 높은 영역에서 더 많은 샘플을 생성합니다.  
+이제 coarse에서 얻은 weight를 정규화하여 **확률 밀도 함수(PDF)**를 구성하고, 이를 누적하여 **누적 분포 함수(CDF)**를 만듭니다. 그다음에는 이 CDF를 활용해 밀도가 높은 영역에서 더 많은 샘플을 생성합니다.  
 이는 단순히 CDF를 만들고 uniform한 난수를 넣는 것만으로도, 확률이 높은 영역을 중심으로 샘플이 몰리는 현상이 일어나기 때문입니다.
 
-<Image src="/images/paper-review/NeRF/importance.png" alt="abc" width={800} height={450} />
+<Image src="/images/paper-review/NeRF/importance.png" alt="importance" width={800} height={450} />
 
 여기서 중요한 질문이 하나 생깁니다:
 
@@ -308,7 +304,7 @@ CDF가 단조 증가 함수라는 성질을 활용하면, uniform하게 뽑은 $
 
 - PDF의 특정 구간에서 값이 높다는 것은, 그 구간이 중요한 영역(예: 물체가 존재하는 영역)이라는 뜻입니다.
 - 이 PDF를 누적하여 얻은 CDF는 해당 영역의 확률 질량을 반영한 형태가 됩니다.
-- CDF에서 u = 0.1, 0.2, ... 등 일정 간격의 값을 역변환하면, 기울기가 가파른 구간(=PDF 값이 큰 구간)이 더 많은 hit를 유도하게 되어, 그 구간에서 샘플이 더 촘촘하게 생성됩니다.
+- CDF에서 $u = 0.1, 0.2, \dots$ 등 일정 간격의 값을 역변환(invert)하면, 기울기가 가파른 구간(=PDF 값이 큰 구간)이 더 많은 hit를 유도하게 되어, 그 구간에서 샘플이 더 촘촘하게 생성됩니다.
 
 ---
 
@@ -321,6 +317,36 @@ z = z_{\text{below}} + \frac{u - \text{CDF}_{\text{below}}}{\text{CDF}_{\text{ab
 $$
 
 NeRF 구현에서는 다음과 같은 `sample_pdf` 함수로 이 과정을 수행합니다:
+
+```python
+def sample_pdf(bins, weights, N_samples, det=False):
+    weights += 1e-5  # numerical stability
+    pdf = weights / tf.reduce_sum(weights, -1, keepdims=True)
+    cdf = tf.cumsum(pdf, -1)
+    cdf = tf.concat([tf.zeros_like(cdf[..., :1]), cdf], -1)
+
+    if det:
+        u = tf.linspace(0., 1., N_samples)
+        u = tf.broadcast_to(u, list(cdf.shape[:-1]) + [N_samples])
+    else:
+        u = tf.random.uniform(list(cdf.shape[:-1]) + [N_samples])
+
+    inds = tf.searchsorted(cdf, u, side='right')
+    below = tf.maximum(0, inds - 1)
+    above = tf.minimum(cdf.shape[-1] - 1, inds)
+    inds_g = tf.stack([below, above], -1)
+
+    cdf_g = tf.gather(cdf, inds_g, axis=-1, batch_dims=len(inds_g.shape)-2)
+    bins_g = tf.gather(bins, inds_g, axis=-1, batch_dims=len(inds_g.shape)-2)
+
+    denom = (cdf_g[..., 1] - cdf_g[..., 0])
+    denom = tf.where(denom < 1e-5, tf.ones_like(denom), denom)
+    t = (u - cdf_g[..., 0]) / denom
+    samples = bins_g[..., 0] + t * (bins_g[..., 1] - bins_g[..., 0])
+    return samples
+
+```
+
 
 ---
 
