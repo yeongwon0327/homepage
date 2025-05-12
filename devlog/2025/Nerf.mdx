@@ -42,9 +42,12 @@ summary: "paper review"
 ## 1. Introduction
 
 &nbsp;&nbsp;NeRF(Neural Radiance Fields)가 처음 제안된 목적은 Novel View Synthesis, 즉 주어진 시점에서 촬영된 이미지들만을 가지고 보지 못한 새로운 시점의 이미지를 rendering하는 것입니다. 이 문제는 컴퓨터 비전과 그래픽스 분야에서 오랫동안 연구되어온 과제로, sparse한 이미지 관측만으로도 연속적인 시점 변화에 대응하는 realistic한 결과를 생성하는 것이 핵심입니다.  
-기존에는 view interpolation이나 mesh, voxel, point cloud 기반 방식들이 사용되었지만, 이들은 <span style={{ color: '#ffb163' }}>**막대한 메모리와 계산 비용, 시점 변화에 따른 표현력 부족이라는**</span> 근본적인 한계를 지니고 있었습니다.  
-&nbsp;&nbsp;NeRF는 이러한 문제를 해결하기 위해 장면을 연속적인 5차원 함수로 모델링합니다. 3D 공간상의 위치 $(x, y, z)$와 시점 방향 $(\theta, \phi)$를 입력으로 받아, 해당 지점의 밀도 $\sigma$와 색상 $c(x,d)$를 출력하는 MLP를 학습합니다. 이 표현은 단순한 RGB 이미지와 카메라 포즈 정보만을 입력으로 받아, 각 픽셀을 관통하는 ray를 따라 샘플링된 point들의 color와 density를 예측하고, 이를 미분 가능한 volume rendering으로 누적하여 실사에 가까운 novel view를 합성합니다.  
- 이러한 접근 방식은 discrete한 입력(view image들)만 가지고도 연속적인 시점(view direction)에 대응하는 결과를 만들어낼 수 있다는 점에서, <span style={{ color: '#ffb163' }}>**continuous scene representation**</span>이라는 새로운 패러다임을 열었고, 이후 다양한 후속 연구의 출발점이 되었습니다.
+기존에는 view interpolation이나 mesh, voxel, point cloud 기반 방식들이 사용되었지만, 이들은 막대한 메모리와 계산 비용, 시점 변화에 따른 표현력 부족이라는 근본적인 한계를 지니고 있었습니다.  
+&nbsp;&nbsp;NeRF는 이러한 문제를 해결하기 위해 장면을 연속적인 5차원 함수로 모델링합니다. 
+<HighlightText lightColor="red.300" darkColor="#ffb163" fontSize="xl">
+3D 공간상의 위치 $(x, y, z)$와 시점 방향 $(\theta, \phi)$를 입력으로 받아, 해당 지점의 밀도 $\sigma$와 색상 $c(x,d)$를 출력하는 MLP를 학습합니다. 이 표현은 단순한 RGB 이미지와 카메라 포즈 정보만을 입력으로 받아, 각 픽셀을 관통하는 ray를 따라 샘플링된 point들의 color와 density를 예측하고, 이를 미분 가능한 volume rendering으로 누적하여 실사에 가까운 novel view를 합성합니다.
+</HighlightText>
+ 이러한 접근 방식은 discrete한 입력(view image들)만 가지고도 연속적인 시점(view direction)에 대응하는 결과를 만들어낼 수 있다는 점에서, continuous scene representation이라는 새로운 패러다임을 열었고, 이후 다양한 후속 연구의 출발점이 되었습니다.
 
 ---
 
@@ -83,13 +86,13 @@ summary: "paper review"
 >  &nbsp;&nbsp;NeRF의 입력부터 출력까지의 전체 파이프라인 과정을 시각적으로 요약한 것이다.
 
 ### (a) 5D Input (Position + Direction)
-&nbsp;&nbsp;카메라 픽셀을 기준으로, rays를 따라 여러 위치 $(x,y,z)$와 를 샘플링하고, 시점 방향 $(\theta,\phi)$와 결합해 <span style={{ color: '#ffb163' }}>**5D 좌표**</span>로 구성합니다. 이는 MLP $F_\Theta$의 입력이 됩니다. 예를 들어, NeRF 논문에서 사용된 Blender Synthetic Dataset(예: Lego, Drums 등)은 기본 해상도 800×800으로 구성되어 있지만, 실험에서는 --half_res 설정을 통해 400×400 해상도로 줄여 사용하며, 이 경우 각 이미지에서 160,000개의 ray가 생성됩니다. 학습 시에는 이 중 약 <span style={{ color: '#ffb163' }}>4096개의</span> ray를 무작위로 샘플링합니다.  
+&nbsp;&nbsp;카메라 픽셀을 기준으로, rays를 따라 여러 위치 $(x,y,z)$와 를 샘플링하고, 시점 방향 $(\theta,\phi)$와 결합해5D 좌표로 구성합니다. 이는 MLP $F_\Theta$의 입력이 됩니다. 예를 들어, NeRF 논문에서 사용된 Blender Synthetic Dataset(예: Lego, Drums 등)은 기본 해상도 800×800으로 구성되어 있지만, 실험에서는 --half_res 설정을 통해 400×400 해상도로 줄여 사용하며, 이 경우 각 이미지에서 160,000개의 ray가 생성됩니다. 학습 시에는 이 중 4096개의 ray를 무작위로 샘플링합니다.  
 &nbsp;&nbsp;각 ray에 대해 먼저 64개의 위치를 stratified sampling으로 선택하여 coarse 네트워크에 전달하고, 여기서 얻은 밀도 값을 기반으로 확률 밀도 함수를 구성하여 중요도 기반으로 128개의 위치를 추가 샘플링하여 fine 네트워크에 입력합니다. 따라서 각 ray는 최대 192개의 위치에서 예측이 수행됩니다.  
-&nbsp;&nbsp;이때 ray의 origin과 direction은 <span style={{ color: '#ffb163' }}>**COLMAP과**</span> 같은 SfM 도구를 통해 복원한 카메라의 extrinsic matrix (camera-to-world) 및 intrinsic parameters(focal length, principal point 등)를 통해 계산되며, 일반적으로 이 pose 정보는 transforms.json 파일로 저장됩니다.
+&nbsp;&nbsp;이때 ray의 origin과 direction은 COLMAP과 같은 SfM 도구를 통해 복원한 카메라의 extrinsic matrix (camera-to-world) 및 intrinsic parameters(focal length, principal point 등)를 통해 계산되며, 일반적으로 이 pose 정보는 transforms.json 파일로 저장됩니다.
 
 ### (b) Output: Color + Density
-&nbsp;&nbsp;NeRF의 MLP는 입력된 위치 및 방향 정보를 바탕으로, 해당 지점의 부피 밀도(volume density)와 방향 의존적 색상(view-dependent RGB color)을 출력합니다. 이는 장면의 광학적 특성—예를 들어, 불투명한 물체의 외곽선이나 반사 특성 등—을 정밀하게 표현하는 데 핵심적인 역할을 합니다.  
-&nbsp;&nbsp;밀도 $\sigma$는 위치 $(x,y,z)$에만 의존하며, 광선이 해당 위치를 통과할 때 얼마나 많은 색상 정보가 누적되는지를 나타냅니다. 이 값은 **장면의 기하 구조(geometry)**를 나타내는 요소입니다.  
+&nbsp;&nbsp;NeRF의 MLP는 입력된 위치 및 방향 정보를 바탕으로, 해당 지점의 volume density와 view-dependent RGB color을 출력합니다. 이는 장면의 광학적 특성—예를 들어, 불투명한 물체의 외곽선이나 반사 특성 등—을 정밀하게 표현하는 데 핵심적인 역할을 합니다.  
+&nbsp;&nbsp;밀도 $\sigma$는 위치 $(x,y,z)$에만 의존하며, 광선이 해당 위치를 통과할 때 얼마나 많은 색상 정보가 누적되는지를 나타냅니다. 이 값은 장면의 geometry를 나타내는 요소입니다.  
 &nbsp;&nbsp;&nbsp;&nbsp;색상 $\mathbf{c}=(r,g,b)$는 위치뿐 아니라 시점 방향 $(\theta, \phi)$에도 의존합니다. 이로 인해 NeRF는 같은 위치라도 시점에 따라 색상이 달라지는 비-Lambertian 재질까지 표현할 수 있습니다.  
 NeRF는 이 두 출력을 하나의 다층 퍼셉트론(MLP)을 통해 예측합니다. 먼저, 3D 위치 정보는 Positional Encoding을 통해 고차원 임베딩된 후 MLP에 입력되고, 이를 바탕으로 밀도 $\sigma$와 중간 feature를 출력합니다. 이후 이 중간 feature와 시점 방향 정보를 결합하여 최종 RGB 색상을 출력합니다.
 
@@ -105,7 +108,7 @@ NeRF는 이 두 출력을 하나의 다층 퍼셉트론(MLP)을 통해 예측합
 $$
 \mathcal{L} = \sum_r \| \hat{C}(r) - C^*(r) \|^2
 $$
-즉, 카메라 포즈와 함께 주어진 실제 이미지에서 각 픽셀에 대응되는 ray를 따라 볼륨 렌더링을 수행한 후, **예측된 픽셀 색상 $\hat{C}(r)$**과 실제 색상 $C^*(r)$ 간의 차이를 계산하고, 이 오차가 작아지도록 MLP를 학습하는 방식입니다.
+즉, 카메라 포즈와 함께 주어진 실제 이미지에서 각 픽셀에 대응되는 ray를 따라 볼륨 렌더링을 수행한 후 예측된 픽셀 색상 $\hat{C}(r)$과 실제 색상 $C^*(r)$ 간의 차이를 계산하고, 이 오차가 작아지도록 MLP를 학습하는 방식입니다.
 
   또한 NeRF는 단일 네트워크만 사용하는 것이 아니라, coarse network와 fine network 두 단계의 MLP를 사용하여, 먼저 전체 영역을 대략적으로 예측한 뒤 중요한 구간을 더 정밀하게 샘플링합니다. 이로써 학습 효율성과 표현 정밀도를 동시에 달성할 수 있습니다.
 
@@ -185,23 +188,16 @@ Ray가 정의되면 그 위를 따라 여러 지점을 샘플링해야 합니다
 $$
 t_i \sim \mathcal{U} \left[ t_n + \frac{i - 1}{N}(t_f - t_n),\; t_n + \frac{i}{N}(t_f - t_n) \right]
 $$
-
-이 방식은 전체 구간을 고르게 커버하면서도 각 구간 안에서 무작위성을 도입해 **편향(bias)**과 **분산(variance)**을 동시에 제어할 수 있도록 해줍니다. 이로 인해 NeRF는 더 안정적이고 일반화 가능한 학습을 수행할 수 있습니다.
-
+<HighlightText fontSize="lg" lightColor="red.400" darkColor="#ffb163">
+이 방식은 전체 구간을 고르게 커버하면서도 각 구간 안에서 무작위성을 도입해 bias과 variance을 동시에 제어해 NeRF는 더 안정적이고 일반화 가능한 학습을 수행할 수 있습니다.
+</HighlightText>
 Stratified Sampling은 수치적 통합(numerical integration) 기법 중 하나인 Monte Carlo Integration의 variance 감소 전략과 동일한 수학적 효과를 가지며, NeRF의 학습 수렴 속도와 품질에 크게 기여합니다. 특히 정적인 카메라 시점에서도 overfitting 없이 전체 장면을 잘 일반화할 수 있도록 돕는 중요한 역할을 합니다.
 
 ---
 
 ### 4. 볼륨 렌더링과 색상 예측
 
-NeRF는 3차원 장면을 2차원 이미지로 렌더링하기 위해, 전통적인 볼륨 렌더링(Volume Rendering) 기법을 채택합니다. 이 방법은 광선(ray)이 3차원 공간을 통과하면서, 각 지점에서 관찰되는 밀도와 색상 정보를 종합해 최종적으로 하나의 픽셀 색상을 결정하는 물리 기반의 누적 모델입니다. 특히 NeRF는 이 과정을 미분 가능하게(differentiable) 설계하여, 신경망 학습 파이프라인에 직접 통합할 수 있도록 구성한 것이 특징입니다.
-먼저, 카메라로부터 발사된 하나의 ray는 아래와 같이 수식으로 정의됩니다.
-
-$$
-r(t) = \mathbf{o} + t\mathbf{d}
-$$
-
-여기서 $\mathbf{o}$는 카메라의 위치, 즉 ray의 시작점이며, $\mathbf{d}$는 ray의 방향 벡터를 의미합니다. $t$는 ray를 따라 이동하는 거리 매개변수로, 이 ray는 $t_n$부터 $t_f$까지의 구간에서 연속적으로 장면의 여러 지점을 관통합니다. NeRF의 MLP는 이 ray가 지나가는 각 위치 $r(t)$에 대해 두 가지 물리량을 예측합니다. 하나는 그 지점에 물체가 존재할 확률을 나타내는 밀도 $\sigma(t)$, 그리고 다른 하나는 **그 위치에서 주어진 방향 $\mathbf{d}$로 관찰될 때의 색상 $c(t, \mathbf{d})$**입니다.
+NeRF의 MLP는 이 ray가 지나가는 각 위치 $r(t)$에 대해 두 가지 물리량을 예측합니다. 하나는 그 지점에 물체가 존재할 확률을 나타내는 밀도 $\sigma(t)$, 그리고 다른 하나는 그 위치에서 주어진 방향 $\mathbf{d}$로 관찰될 때의 색상 $c(t, \mathbf{d})$입니다.
 이처럼 얻어진 예측값들을 바탕으로, NeRF는 각 픽셀의 최종 색상 $C(r)$를 다음과 같은 연속 적분 형태로 정의합니다.
 
 $$
@@ -214,8 +210,13 @@ $$
 T(t) = \exp\left( -\int_{t_n}^t \sigma(s) \, ds \right)
 $$
 
-이 수식은 직관적으로 해석할 수 있습니다. 만약 ray가 지나온 구간에 높은 밀도(즉, 물체가 많이 존재하는 영역)가 많았다면, $T(t)$는 작아지고 해당 지점의 색상은 최종 픽셀 색상에 거의 기여하지 못하게 됩니다. 반면, ray가 거의 흡수되지 않고 특정 지점 $t$까지 도달할 수 있었다면 $T(t)$는 커지며, 이 지점의 색상이 더 큰 영향력을 가지게 됩니다.
-NeRF의 이 볼륨 렌더링 수식은 물리적 모델링 관점 외에도, 확률적 기대값의 형태로 해석할 수 있다는 점에서 매우 흥미롭습니다. $\sigma(t)$를 "위치 $t$에 물체가 존재할 확률 밀도", $T(t)$를 "해당 위치까지 ray가 살아남을 생존 확률", 그리고 $c(t, \mathbf{d})$를 "조건부 색상"이라고 해석한다면, 전체 적분은 다음과 같은 확률 가중 평균 형태로 볼 수 있습니다:
+이 수식은 직관적으로 해석할 수 있습니다. 
+만약 ray가 지나온 구간에 높은 밀도(즉, 물체가 많이 존재하는 영역)가 많았다면, $T(t)$는 작아지고 해당 지점의 색상은 최종 픽셀 색상에 거의 기여하지 못하게 됩니다. 반면, ray가 거의 흡수되지 않고 특정 지점 $t$까지 도달할 수 있었다면 $T(t)$는 커지며, 이 지점의 색상이 더 큰 영향력을 가지게 됩니다.
+NeRF의 이 볼륨 렌더링 수식은 물리적 모델링 관점 외에도, 확률적 기대값의 형태로 해석할 수 있다는 점에서 매우 흥미롭습니다. 
+<HighlightText fontSize="lg" lightColor="red.400" darkColor="#ffb163">
+$\sigma(t)$를 위치 $t$에 물체가 존재할 확률 밀도, $T(t)$를 해당 위치까지 ray가 살아남을 생존 확률, 그리고 $c(t, \mathbf{d})$를 조건부 색상
+</HighlightText>
+이라고 해석한다면, 전체 적분은 다음과 같은 확률 가중 평균 형태로 볼 수 있습니다:
 
 $$
 C(r) = \mathbb{E}_{t \sim p(t)}[c(t)] = \int p(t) \cdot c(t) \, dt, \quad \text{where } p(t) = T(t) \cdot \sigma(t)
@@ -251,8 +252,12 @@ $$
 
 ### 5. MLP 입력 및 구조
 
-NeRF는 3차원 장면 내 임의의 지점에서 ray를 따라 관찰되는 색상과 밀도 값을 예측하기 위해 다층 퍼셉트론(MLP)을 사용합니다. 그러나 단순한 위치 벡터 $(x,y,z)$와 시점 방향 벡터 $(\theta,\phi)$만을 저차원 형태로 입력하면, MLP는 경계, 텍스처, 반사와 같은 고주파 정보를 제대로 표현하지 못하는 한계를 가집니다. 이는 Rahaman et al.(2019)의 연구 [On the Spectral Bias of Neural Networks](https://arxiv.org/abs/1806.08734)에서도 지적되었듯, 일반적인 신경망이 낮은 주파수부터 우선 학습하려는 경향(spectral bias)을 가지기 때문입니다. NeRF는 이러한 한계를 극복하기 위해 Positional Encoding을 진행합니다. 본 섹션에서는 그 중 전자인 Positional Encoding과 MLP의 구조적 설계에 대해 자세히 설명합니다. NeRF는 각 ray 상의 샘플링 지점에 대해, 위치 벡터 
-$x$와 viewing direction 벡터 $d$를 입력으로 받아 밀도와 색상RGB을 예측합니다. 그러나 이 두 벡터는 단순한 3차원 좌표로는 표현력이 부족하기 때문에, NeRF는 이들을 고차원 공간으로 사인·코사인 변환하는 Positional Encoding을 적용합니다. 이 인코딩은 입력의 각 스칼라 성분 $p$에 대해, 다음과 같이 정의된 주기 함수를 적용합니다:
+NeRF는 3차원 장면 내 임의의 지점에서 ray를 따라 관찰되는 색상과 밀도 값을 예측하기 위해 다층 퍼셉트론(MLP)을 사용합니다. 그러나 단순한 위치 벡터 $(x,y,z)$와 시점 방향 벡터 $(\theta,\phi)$만을 저차원 형태로 입력하면, MLP는 경계, 텍스처, 반사와 같은 고주파 정보를 제대로 표현하지 못하는 한계를 가집니다. 이는 Rahaman et al.(2019)의 연구 [[On the Spectral Bias of Neural Networks]](https://arxiv.org/abs/1806.08734)에서도 지적되었듯, 
+<HighlightText fontSize="lg" lightColor="red.400" darkColor="#ffb163">
+일반적인 신경망이 낮은 주파수부터 우선 학습하려는 spectral bias을 가지기 때문입니다.
+</HighlightText>
+ NeRF는 이러한 한계를 극복하기 위해 Positional Encoding을 진행합니다. 본 섹션에서는 그 중 전자인 Positional Encoding과 MLP의 구조적 설계에 대해 자세히 설명합니다. NeRF는 각 ray 상의 샘플링 지점에 대해, 위치 벡터 
+$x$와 viewing direction 벡터 $d$를 입력으로 받아 밀도와 색상RGB을 예측합니다. 그러나 이 두 벡터는 단순한 3차원 좌표로는 표현력이 부족하기 때문에, NeRF는 이들을 고차원 공간으로 사인·코사인 변환하는 Positional Encoding을 적용합니다. 이 인코딩은 입력의 각 스칼라 성분 $p$에 대해, 다음과 같이 정의된 함수를 적용합니다:
 
 $$
 \gamma(p) = \left[
@@ -267,7 +272,7 @@ $$
 <Image src="/images/paper-review/NeRF/architecture.jpeg" width={800} height={450} alt="..." />
 
 이제 NeRF의 전체 MLP 구조는 두 단계로 나뉩니다. 첫 번째 단계는 위치 인코딩 벡터 
-$\gamma(x) \in \mathbb(R^60)$를 입력받아 밀도와 중간 특성 벡터를 출력하는 geometry branch입니다. 이 브랜치는 256 채널의 Fully Connected 레이어 4개를 연속으로 통과한 뒤, 네 번째 레이어 출력과 원래 입력 
+$\gamma(x) \in \mathbb(R^{60})$를 입력받아 밀도와 중간 특성 벡터를 출력하는 geometry branch입니다. 이 브랜치는 256 채널의 Fully Connected 레이어 4개를 연속으로 통과한 뒤, 네 번째 레이어 출력과 원래 입력 
 $\gamma(x)$를 skip connection으로 다시 결합합니다. 결합된 316차원 벡터는 추가로 4개의 FC 레이어를 더 거쳐, 최종적으로 밀도 값과 중간 표현을 출력합니다. 이 중 밀도는 ReLU 함수를 통해 양수로 제한되며, 이는 물체 내부와 공기를 구분하기 위한 물리적 제약을 반영한 것입니다.
 
 두 번째 단계는 중간 표현 벡터 $f$와 viewing direction의 positional encoding 
@@ -281,23 +286,25 @@ RGB를 출력합니다. 이처럼 시점 정보는 late-fusion 방식으로 적�
 
 ### 6. Hierarchical Sampling (Coarse → Fine)
 
-NeRF는 3차원 장면을 2차원 이미지로 렌더링하기 위해, 각 픽셀에 해당하는 ray를 따라 연속적인 지점에서 밀도와 색상을 예측합니다. 그런데 모든 위치를 균등하게 샘플링할 경우, 중요한 경계나 복잡한 물체 구조는 충분히 포착되지 않고, 연산이 비효율적으로 낭비될 수 있습니다. 이를 해결하기 위해 NeRF는 중요한 구간에 더 많은 샘플을 집중하는 **Hierarchical Sampling**, 즉 계층적 샘플링 전략을 도입합니다.
+NeRF는 각 픽셀에 해당하는 ray를 따라 연속적인 지점에서 밀도와 색상을 예측합니다. 하지만 모든 위치를 균등하게 샘플링하면 경계나 물체 내부 구조를 포착하지 못하고, 연산도 비효율적으로 낭비됩니다. 이를 해결하기 위해 NeRF는 중요한 구간에 더 많은 샘플을 집중시키는 Hierarchical Sampling 전략을 도입합니다.
 
-먼저 coarse 단계에서는 ray 위의 일정 간격으로 $N_c = 64$개의 샘플을 생성하고, 각 구간 내에서 무작위로 하나의 지점을 선택하는 **Stratified Sampling**을 사용합니다. 이 방식은 구간 간의 균등성과 구간 내의 무작위성을 동시에 확보하여 aliasing과 overfitting을 줄입니다. 각 샘플 위치 $z_i$에서 예측된 밀도 $\sigma_i$를 통해 해당 구간의 중요도를 추정하고, 이로부터 weight를 계산합니다.
+먼저 coarse 단계에서는 ray 위의 일정 간격으로 $N_c = 64$개의 샘플을 생성하고, 각 구간 내에서 무작위로 하나의 지점을 선택하는 Stratified Sampling을 사용합니다. 이 방식은 구간 간의 균등성과 구간 내의 무작위성을 동시에 확보하여 aliasing과 overfitting을 줄입니다. 각 샘플 위치 $z_i$에서 예측된 밀도 $\sigma_i$를 통해 해당 구간의 중요도를 추정하고, 이로부터 weight를 계산합니다.
 
 
-#### 2차 샘플링의 핵심: Importance Sampling의 통계적 직관
+#### 2차 샘플링의 핵심: Importance Sampling
 
-이제 coarse에서 얻은 weight를 정규화하여 **확률 밀도 함수(PDF)**를 구성하고, 이를 누적하여 **누적 분포 함수(CDF)**를 만듭니다. 그다음에는 이 CDF를 활용해 밀도가 높은 영역에서 더 많은 샘플을 생성합니다.  
-이는 단순히 CDF를 만들고 uniform한 난수를 넣는 것만으로도, 확률이 높은 영역을 중심으로 샘플이 몰리는 현상이 일어나기 때문입니다.
+이제 coarse에서 얻은 weight를 정규화하여 확률 밀도 함수(PDF)를 구성하고, 이를 누적하여 누적 분포 함수(CDF)를 만듭니다. 이후 이 CDF를 이용해 중요한 구간에서 더 많은 샘플을 생성하는 계층적 샘플링을 수행합니다.
+이는 단순히 uniform 분포에서 난수를 생성한 후, 이를 CDF에 대응시키기만 해도 확률이 높은 영역에 샘플이 자동으로 몰리게 되는 매우 효율적인 샘플링 방식입니다.
 
 <Image src="/images/paper-review/NeRF/importance.png" alt="importance" width={800} height={450} />
 
-여기서 중요한 질문이 하나 생깁니다:
+<HighlightText lightColor="red.300" darkColor="#ffb163" fontSize="xl">
+여기서 중요한 질문이 하나 생깁니다.  
+단순히 [0, 1] 구간에서 uniform하게 샘플 $u \sim \mathcal{U}(0, 1)$ 을 뽑을 뿐인데, 어떻게 밀도 기반의 샘플링이 가능한가?
+</HighlightText>
 
-> 우리는 단순히 [0, 1] 구간에서 uniform하게 샘플 $u \sim \mathcal{U}(0, 1)$ 을 뽑을 뿐인데, 어떻게 밀도 기반의 샘플링이 가능한가?
 
-그 해답이 바로 **Inverse Transform Sampling**입니다.  
+그 해답이 바로 Inverse Transform Sampling입니다.  
 CDF가 단조 증가 함수라는 성질을 활용하면, uniform하게 뽑은 $u$를 CDF의 역함수로 변환함으로써, 확률이 높은 구간일수록 더 많은 샘플을 생성할 수 있습니다.
 
 이 방식의 핵심 원리는 다음과 같습니다:
@@ -306,11 +313,10 @@ CDF가 단조 증가 함수라는 성질을 활용하면, uniform하게 뽑은 $
 - 이 PDF를 누적하여 얻은 CDF는 해당 영역의 확률 질량을 반영한 형태가 됩니다.
 - CDF에서 $u = 0.1, 0.2, \dots$ 등 일정 간격의 값을 역변환(invert)하면, 기울기가 가파른 구간(=PDF 값이 큰 구간)이 더 많은 hit를 유도하게 되어, 그 구간에서 샘플이 더 촘촘하게 생성됩니다.
 
----
 
-#### Fine Sampling: Inverse Transform Sampling 적용
+#### Fine Sampling: Inverse Transform Sampling 구현
 
-이제 CDF를 만든 뒤 uniform하게 샘플링한 $u \sim \mathcal{U}(0,1)$ 값에 대해, 해당 값이 속하는 CDF 구간을 찾아 그에 대응하는 z 값을 보간하여 얻습니다. 이 방식은 아래와 같은 보간 수식을 사용합니다:
+다음은 이 원리를 실제 코드에 적용한 핵심 부분입니다. CDF를 기반으로 균등 분포 샘플 $u$를 적절한 구간으로 매핑하여, 그에 대응하는 샘플 $z$를 선형 보간 방식으로 계산합니다:
 
 $$
 z = z_{\text{below}} + \frac{u - \text{CDF}_{\text{below}}}{\text{CDF}_{\text{above}} - \text{CDF}_{\text{below}}} \cdot (z_{\text{above}} - z_{\text{below}})
@@ -320,30 +326,30 @@ NeRF 구현에서는 다음과 같은 `sample_pdf` 함수로 이 과정을 수�
 
 ```python
 def sample_pdf(bins, weights, N_samples, det=False):
-    weights += 1e-5  # numerical stability
-    pdf = weights / tf.reduce_sum(weights, -1, keepdims=True)
-    cdf = tf.cumsum(pdf, -1)
-    cdf = tf.concat([tf.zeros_like(cdf[..., :1]), cdf], -1)
+    # Normalize weights → PDF, then integrate → CDF
+    weights += 1e-5  # prevent division by zero
+    pdf = weights / tf.reduce_sum(weights, axis=-1, keepdims=True)
+    cdf = tf.concat([tf.zeros_like(pdf[..., :1]), tf.cumsum(pdf, axis=-1)], axis=-1)
 
+    # Uniform samples in [0, 1] → to be mapped via inverse CDF
     if det:
         u = tf.linspace(0., 1., N_samples)
-        u = tf.broadcast_to(u, list(cdf.shape[:-1]) + [N_samples])
+        u = tf.broadcast_to(u, tf.shape(cdf)[..., :-1] + [N_samples])
     else:
-        u = tf.random.uniform(list(cdf.shape[:-1]) + [N_samples])
+        u = tf.random.uniform(tf.shape(cdf)[..., :-1] + [N_samples])
 
+    # Locate CDF bins for each u
     inds = tf.searchsorted(cdf, u, side='right')
     below = tf.maximum(0, inds - 1)
     above = tf.minimum(cdf.shape[-1] - 1, inds)
-    inds_g = tf.stack([below, above], -1)
+    inds_g = tf.stack([below, above], axis=-1)
 
-    cdf_g = tf.gather(cdf, inds_g, axis=-1, batch_dims=len(inds_g.shape)-2)
-    bins_g = tf.gather(bins, inds_g, axis=-1, batch_dims=len(inds_g.shape)-2)
-
-    denom = (cdf_g[..., 1] - cdf_g[..., 0])
-    denom = tf.where(denom < 1e-5, tf.ones_like(denom), denom)
+    # Linear interpolation between CDF bounds
+    cdf_g = tf.gather(cdf, inds_g, axis=-1, batch_dims=len(cdf.shape) - 2)
+    bins_g = tf.gather(bins, inds_g, axis=-1, batch_dims=len(bins.shape) - 2)
+    denom = tf.where(cdf_g[..., 1] - cdf_g[..., 0] < 1e-5, 1., cdf_g[..., 1] - cdf_g[..., 0])
     t = (u - cdf_g[..., 0]) / denom
-    samples = bins_g[..., 0] + t * (bins_g[..., 1] - bins_g[..., 0])
-    return samples
+    return bins_g[..., 0] + t * (bins_g[..., 1] - bins_g[..., 0])
 
 ```
 
@@ -385,30 +391,6 @@ $C^*(\mathbf{r})$: ground truth 색상
 
 ### 8. 실험 및 결과 / Experiments and Results
 
-### Datasets
-
-- Diffuse Synthetic 360° (DeepVoxels)
-
-간단한 구조와 Lambertian 반사(모든 방향으로 균일 반사)를 가지는 4개 객체
-
-반구형 궤적을 따라 512×512 해상도로 촬영
-
-기존 연구와의 정량 비교를 위한 기준 데이터셋
-
-- Realistic Synthetic 360° (저자 자체 제작)
-
-현실적인 반사 성질을 가지는 8개 객체 (non-Lambertian surface)
-
-대부분 반구 궤적, 일부는 구형 궤적을 따라 800×800 해상도로 촬영
-
-복잡한 조명과 반사를 포함한 신중하게 구성된 합성 데이터셋
-
-- Real Forward-Facing (LLFF)
-
-실제 장면을 전방위(viewing cone)에서 촬영한 이미지들
-
-카메라의 움직임이 한쪽 방향(전방)으로 제한된 복잡한 실세계 데이터셋
-
 ### Implementation Details
 - 배치 크기: 4096개의 ray 샘플 포인트 사용
 - Optimizer: Adam
@@ -427,11 +409,14 @@ $C^*(\mathbf{r})$: ground truth 색상
 
 NeRF 논문에서는 생성된 이미지의 품질을 평가하기 위해 PSNR, SSIM, LPIPS 세 가지 지표를 사용합니다.
 
-PSNR(Peak Signal-to-Noise Ratio)은 원본 이미지와 복원 이미지 간의 평균 제곱 오차(MSE)를 기반으로 계산되며, 수치가 높을수록 복원 정확도가 높고 왜곡이 적다는 것을 의미합니다. 단위는 데시벨(dB)이며, 주로 화질 손실 정도를 정량적으로 평가할 때 사용됩니다.
+- PSNR(Peak Signal-to-Noise Ratio)은  
+ 원본 이미지와 복원 이미지 간의 평균 제곱 오차(MSE)를 기반으로 계산되며, 수치가 높을수록 복원 정확도가 높고 왜곡이 적다는 것을 의미합니다. 단위는 데시벨(dB)이며, 주로 화질 손실 정도를 정량적으로 평가할 때 사용됩니다.
 
-SSIM(Structural Similarity Index Measure)은 두 이미지 간의 밝기, 대비, 구조 정보를 종합적으로 비교하여 시각적 유사도를 측정하는 지표입니다. 값의 범위는 0에서 1 사이이며, 1에 가까울수록 사람의 눈에 보기에도 유사한 이미지로 평가됩니다.
+- SSIM(Structural Similarity Index Measure)은  
+두 이미지 간의 밝기, 대비, 구조 정보를 종합적으로 비교하여 시각적 유사도를 측정하는 지표입니다. 값의 범위는 0에서 1 사이이며, 1에 가까울수록 사람의 눈에 보기에도 유사한 이미지로 평가됩니다.
 
-LPIPS(Learned Perceptual Image Patch Similarity)는 사전 학습된 딥러닝 네트워크를 통해 이미지 간의 인지적 차이를 측정하는 지표입니다. 값이 낮을수록 두 이미지가 시각적으로 더 유사하다는 뜻이며, 세밀한 질감이나 시각적 품질 차이를 평가하는 데 효과적입니다.
+- LPIPS(Learned Perceptual Image Patch Similarity)는  
+사전 학습된 딥러닝 네트워크를 통해 이미지 간의 인지적 차이를 측정하는 지표입니다. 값이 낮을수록 두 이미지가 시각적으로 더 유사하다는 뜻이며, 세밀한 질감이나 시각적 품질 차이를 평가하는 데 효과적입니다.
 
 <Image src="/images/paper-review/NeRF/ablation_study.png" width={800} height={450} alt="..." />
 
@@ -439,11 +424,33 @@ LPIPS(Learned Perceptual Image Patch Similarity)는 사전 학습된 딥러닝 �
 
 ## 9. 결론 / Conclusion
 
-NeRF는 복잡한 기하와 재질을 하나의 MLP로 연속적으로 표현하는 breakthrough였으며, 이후 수많은 확장 논문들이 등장하며 딥러닝 기반 3D 장면 표현의 새로운 기준이 되었다.
+NeRF는 정적 3D 장면을 연속적인 위치, 시점 방향로 표현하여, 기존의 복셀, 메쉬, 포인트 클라우드 기반 방식보다 훨씬 더 높은 품질의 novel view synthesis를 가능하게 했습니다. NeRF는 특히 sparse한 이미지 입력만으로도 고해상도 이미지를 생성해내는 혁신적인 접근으로, 신경망 기반 3D 재구성의 패러다임을 크게 전환시켰습니다.
+하지만 NeRF는 실용적인 응용을 위해 해결해야 할 여러 한계를 지니고 있습니다:
 
-## 참고자료
+- 느린 학습 및 렌더링 속도
+NeRF는 수십만 번의 iteration을 거쳐야 장면 하나를 학습할 수 있어, 시간과 연산 자원이 과도하게 요구됩니다.
+→ Plenoxels, Instant-NGP 등은 연산 효율을 극적으로 개선하는 방향으로 발전했습니다.
 
-- [Original NeRF Paper](https://arxiv.org/abs/2003.08934)
-- [Official Code (GitHub)](https://github.com/bmild/nerf)
-- [Instant-NGP (2022)](https://github.com/NVlabs/instant-ngp)
-- [NeRF-W (2021)](https://arxiv.org/abs/2012.09730)
+- 정적 장면에 국한된 성능
+동적 객체나 장면에서는 재구성 정확도가 떨어지며 노이즈가 많아집니다.
+→ D-NeRF, Nerfies, HyperNeRF는 시간 축을 포함한 장면 모델링을 시도합니다.
+
+- 조명 변화에 취약
+NeRF는 동일 물체라도 촬영 환경(조도, 날씨 등)이 다르면 일반화가 어렵습니다.
+→ NeRF in the Wild, NeRV, NeRD 등은 다양한 조건을 반영하는 모델로 확장됩니다.
+
+- 범용성 부족 (Generalization)
+하나의 NeRF 모델은 하나의 장면에 특화되어, 다른 장면에 직접 활용할 수 없습니다.
+→ pixel-NeRF, GIRAFFE 등은 few-shot 또는 zero-shot generalization을 시도합니다.
+
+- 다량의 입력 이미지 요구
+수십~수백 장의 시점 이미지가 필요하다는 점은 실사용에서 비효율적입니다.
+→ DietNeRF, RegNeRF 등은 소수의 이미지로도 재구성 가능한 모델을 개발 중입니다.
+
+- 카메라 파라미터 의존성
+학습을 위해 정확한 camera pose 정보가 반드시 필요하다는 점은 일반 사용자에겐 큰 장벽입니다.
+→ iNeRF, BARF, SCNeRF 등은 포즈 추정 또는 공동 학습 방식을 통해 이 제약을 줄이려 합니다.
+
+#### 앞으로의 방향성
+NeRF는 단일 논문 이상의 가치를 가지며, 이후 수많은 파생 연구들을 촉진시킨 3D 장면 표현의 새로운 시대를 연 전환점이라 할 수 있습니다. 현재 NeRF 기반 기술은 SLAM, object reconstruction, scene editing, generative modeling 등 다양한 3D-aware task에 핵심 구성 요소로 적용되고 있으며, 앞으로도 실시간성, 범용성, 확장성 측면에서 지속적인 발전이 예상됩니다.
+NeRF는 "신경망 기반 장면 재구성"이라는 개념을 명확하게 정립하고 실제로 구현해낸 첫 사례 중 하나로, 앞으로의 컴퓨터 비전 및 컴퓨터 그래픽스 연구에서 반드시 이해하고 넘어가야 할 핵심 기술적 자산이라 생각됩니다.

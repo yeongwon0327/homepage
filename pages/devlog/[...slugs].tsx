@@ -14,6 +14,7 @@ import NextImage from 'next/image'
 import PdfViewer from '../../components/PdfViewer'
 import HighlightText from '../../components/HighlightText'
 import remarkGfm from 'remark-gfm'
+import rehypePrism from 'rehype-prism-plus'
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
 
@@ -51,7 +52,7 @@ const components = {
   th: Th,
   td: Td,
 
-  // ✅ Images with basePath prepended if not external
+
   img: (props: any) => {
     const src = props.src?.startsWith('http') ? props.src : `${basePath}${props.src}`
     return (
@@ -113,7 +114,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const mdxSource = await serialize(content, {
     mdxOptions: {
       remarkPlugins: [remarkMath, remarkGfm],
-      rehypePlugins: [rehypeKatex],
+      rehypePlugins: [rehypeKatex,rehypePrism],
     },
   })
 
