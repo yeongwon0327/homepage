@@ -5,7 +5,7 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { getAllPosts } from '../../lib/posts'
-import { Container, Heading, Box, Text, Button, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react'
+import { Container, Heading, Box, Text, Button, Table, Thead, Tbody, Tr, Th, Td, Flex } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
@@ -81,6 +81,8 @@ const components = {
   PdfViewer,
   Box,
   HighlightText,
+  Flex,
+  Text
 }
 
 
