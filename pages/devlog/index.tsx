@@ -1,12 +1,15 @@
 import { getAllPosts } from '../../lib/posts'
-import { Container, Heading, SimpleGrid, Box, Text, Link } from '@chakra-ui/react'
+import { Container, Heading, SimpleGrid, Box, Text, Link, Badge } from '@chakra-ui/react'
 import NextLink from 'next/link'
 
 export const getStaticProps = () => {
   const posts = getAllPosts()
 
-  // 최신순 정렬
-  posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  posts.sort((a, b) => {
+    if (a.pinned && !b.pinned) return -1
+    if (!a.pinned && b.pinned) return 1
+    return new Date(b.date).getTime() - new Date(a.date).getTime()
+  })
 
   return { props: { posts } }
 }
@@ -26,6 +29,12 @@ export default function BlogIndex({ posts }) {
             boxShadow="md"
             overflow="hidden"
           >
+            {post.pinned && (
+              <Badge colorScheme="orange" mb={2}>
+                📌 Pinned
+              </Badge>
+            )}
+
             <Link
               as={NextLink}
               href={`/devlog${post.slug}`}
@@ -34,6 +43,8 @@ export default function BlogIndex({ posts }) {
               noOfLines={1}
               isTruncated
               color="teal.300"
+              display="block"
+              mt={post.pinned ? 1 : 0}
             >
               {post.title}
             </Link>

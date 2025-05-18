@@ -11,11 +11,13 @@ export const getAllPosts = () => {
     const source = fs.readFileSync(filePath, 'utf8')
     const { data } = matter(source)
     const slug = '/' + path.relative(POSTS_PATH, filePath).replace(/\.mdx$/, '')
+    
     return {
-      slug, // ex: /2024/first-blog
+      slug,
       title: data.title,
       date: data.date,
-      summary: data.summary
+      summary: data.summary,
+      pinned: data.pinned === true || data.pinned === 'true'
     }
   })
 }
