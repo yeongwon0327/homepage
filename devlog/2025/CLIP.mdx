@@ -4,8 +4,7 @@ date: "2025-05-13"
 summary: "paper review"
 ---
 
-> 2021년 발표된 CLIP 논문  
-> _[Radford et al., ICML 2021](https://arxiv.org/abs/2103.00020)_ 을 상세히 분석한 리뷰입니다.  
+> 2021년 발표된 CLIP 논문
 > [[paper]](https://arxiv.org/abs/2003.08934), [[blog]](https://openai.com/index/clip/), [[GitHub]](https://github.com/openai/CLIP?tab=readme-ov-file)  
 > Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, Ilya Sutskever  
 > OpenAI    
@@ -14,7 +13,7 @@ summary: "paper review"
 
 ## 목차 / Table of Contents
 
-1. 서론: 왜 CLIP인가?
+1. 서론 (Introduction)
 2. 관련 연구 (Related Works)
 3. 데이터셋 구축 (WIT: WebImageText)
 4. 모델 구조 (CLIP Architecture)
@@ -42,7 +41,7 @@ summary: "paper review"
 
 
 
-## 1. 서론: 왜 CLIP인가?
+## 1. 서론 (Introduction)
 
 <HighlightText lightColor="red.300" darkColor="#ffb163"> 컴퓨터 비전 분야는 오랜 시간 동안 고정된 label에 기반한 supervised learning 방식을 중심으로 발전해왔습니다. </HighlightText>
 대표적으로 ImageNet과 같은 대규모 데이터셋이 그 중심에 있었으며, 모델들은 사전에 정의된 클래스에 대해 높은 성능을 보이도록 학습되었습니다. 하지만 이러한 방식은 범용성에 제한이 있으며, 새로운 태스크나 클래스에 대한 유연한 대응이 어렵다는 한계가 존재합니다.
