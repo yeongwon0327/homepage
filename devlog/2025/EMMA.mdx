@@ -20,7 +20,9 @@ summary: "paper review"
 6. 결론 및 의의  
 
 ---  
- 
+
+<br />
+
 <Image
   src="/images/paper-review/OpenEMMA/OpenEMMA_framework.png"
   alt="clip overview"
@@ -29,6 +31,12 @@ summary: "paper review"
   style={{ margin: '0 auto', display: 'block' }}
 />
 
+&nbsp;&nbsp;Waymo End-to-End Driving Challenge와 같이 복잡한 장면에서의 행동 예측이 강조되는 과제들이 늘어나고 있는 가운데 
+사전 학습된 MLLM을 활용하여 자연어 기반 추론을 통해 행동을 예측하는 접근을 제시한 점에서 매우 인상 깊었습니다.   
+Fine-tuning 없이도 prompt 기반 추론만으로 복잡한 주행 정책을 생성할 수 있다는 점에서 end-to-end 자율주행 시스템에 대한 새로운 가능성을 보여주었고 
+Vision-Language-Action 기반 embodied agent 연구로도 확장될 수 있는 통합적 방법론이라고 판단하여 본 논문을 분석하게 되었습니다.  
+
+---
 
 ## 1. 서론 (Introduction)
 
@@ -125,10 +133,8 @@ def SceneDescription(obs_images, processor=None, model=None, tokenizer=None, arg
 coordinates = re.findall(r"\[([-+]?\d*\.?\d+),\s*([-+]?\d*\.?\d+)\]", prediction)
 speed_curvature_pred = [[float(v), float(k)] for v, k in coordinates]
 ```
+#### Trajectory
 
-
-<HighlightText lightColor="red.300" darkColor="#ffb163"> Stage 2: Predicting </HighlightText>
-<br />
 예측된 속도 및 곡률은 다음 수식을 기반으로 통합되어 ego-trajectory를 생성합니다.
 
 $$
@@ -155,6 +161,8 @@ $$
 y_t \approx y_0 + \sum_{i=1}^{t} v_y(i) \cdot \Delta t
 $$
 
+<HighlightText lightColor="red.300" darkColor="#ffb163">코드 내부에서는 단순 Riemann sum이 아닌 trapezoidal rule을 사용하여 보다 정밀한 적분을 수행합니다.</HighlightText>
+
 ```python
 # cumulative_trapezoid를 활용한 수치 적분
 theta = cumulative_trapezoid(curvatures * velocities, t, initial=0)
@@ -163,7 +171,6 @@ v_y = velocities * np.sin(theta)
 x = cumulative_trapezoid(v_x, t, initial=0)
 y = cumulative_trapezoid(v_y, t, initial=0)
 ```
-위 계산은 코드상 IntegrateCurvatureForPoints() 함수에 구현되어 있습니다.  
 
 ```python
 def IntegrateCurvatureForPoints(curvatures, velocities_norm, initial_position, initial_heading, time_span):
