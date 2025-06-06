@@ -67,9 +67,56 @@ const Home = () => {
           About me
         </Heading>
         <Paragraph>
-          I graduated from the Department of Automotive Engineering at Hanyang University. 
-          While I am not yet part of a research lab, I am actively preparing for my future in AI and 3D computer vision. 
-          I look forward to sharing my progress with you soon!
+          Hello! I received a Bachelor's degree in{' '}
+          <Link
+            href="https://ae.hanyang.ac.kr/%ED%99%88"
+            isExternal
+            display="inline"
+            textDecoration="none"
+            letterSpacing="normal"
+            fontWeight="normal"
+            _hover={{
+              textDecoration: 'underline',
+              color: 'teal.300',
+            }}
+          >
+            Automotive Engineering from Hanyang University
+          </Link>
+          . I am currently an intern at the{' '}
+          <Link
+            href="https://bi.snu.ac.kr/"
+            isExternal
+            display="inline"
+            textDecoration="none"
+            letterSpacing="normal"
+            fontWeight="normal"
+            _hover={{
+              textDecoration: 'underline',
+              color: 'teal.300',
+            }}
+          >
+            Biointelligence Lab at Seoul National University
+          </Link>{' '}
+          under the supervision of{' '}
+          <Link
+            href="https://bi.snu.ac.kr/members/byoung-tak-zhang.html"
+            isExternal
+            display="inline"
+            textDecoration="none"
+            letterSpacing="normal"
+            fontWeight="normal"
+            _hover={{
+              textDecoration: 'underline',
+              color: 'teal.300',
+            }}
+          >
+            Prof. Byoung-Tak Zhang
+          </Link>
+          .
+          <br />
+          &nbsp;&nbsp;My research interests focus on Vision-Language-Action (VLA), particularly leveraging computer vision 
+          to enable intelligent agents to perceive, understand, and interact with dynamic real-world environments. 
+          I am actively exploring these directions and look forward to sharing my future progress.
         </Paragraph>
         <Box align="center" my={4}>
           <Button
