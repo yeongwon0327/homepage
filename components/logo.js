@@ -33,7 +33,7 @@ const Logo = () => {
           fontWeight="bold"
           ml={3}
         >
-          Lee Chung-woo
+          Lee Jun-won
         </Text>
       </LogoBox>
 

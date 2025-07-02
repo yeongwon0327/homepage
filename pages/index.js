@@ -32,7 +32,7 @@ const Home = () => {
       <Box display={{ md: 'flex' }}>
         <Box flexGrow={1}>
           <Heading as="h2" variant="page-title">
-            Lee Chung-woo
+            Lee Jun-won
           </Heading>
           <p>Prospective Graduate Student</p>
         </Box>
@@ -53,7 +53,7 @@ const Home = () => {
             overflow="hidden"
           >
             <Image
-              src={`${basePath}/images/chungwoo.jpg`}
+              src={`${basePath}/images/junwon.jpg`}
               alt="Profile image"
               width="150"
               height="150"
@@ -69,7 +69,7 @@ const Home = () => {
         <Paragraph>
           Hello! I received a Bachelor's degree in{' '}
           <Link
-            href="https://ae.hanyang.ac.kr/%ED%99%88"
+            href="https://chem.hanyang.ac.kr/frontpage.asp?catalogid=hychem2&language=ko"
             isExternal
             display="inline"
             textDecoration="none"
@@ -80,11 +80,11 @@ const Home = () => {
               color: 'teal.300',
             }}
           >
-            Automotive Engineering from Hanyang University
+            Chemistry from Hanyang University
           </Link>
-          . I am currently an intern at the{' '}
+          . I am currently a master's student in the Department of Chemistry at KAIST.{' '}
           <Link
-            href="https://bi.snu.ac.kr/"
+            href="https://scale.kaist.ac.kr/"
             isExternal
             display="inline"
             textDecoration="none"
@@ -95,7 +95,7 @@ const Home = () => {
               color: 'teal.300',
             }}
           >
-            Biointelligence Lab at Seoul National University
+            SCALE Lab at KAIST
           </Link>{' '}
           under the supervision of{' '}
           <Link
@@ -110,13 +110,16 @@ const Home = () => {
               color: 'teal.300',
             }}
           >
-            Prof. Byoung-Tak Zhang
+            Prof. Park-jeong yeong
           </Link>
           .
           <br />
-          &nbsp;&nbsp;My research interests focus on Vision-Language-Action (VLA), particularly leveraging computer vision 
-          to enable intelligent agents to perceive, understand, and interact with dynamic real-world environments. 
-          I am actively exploring these directions and look forward to sharing my future progress.
+          &nbsp;&nbsp;My research interests focus on surface chemistry as well as measurement and inspection (MI). 
+          Specifically, I am studying the device characteristics of highly integrated memory semiconductors, 
+          improving critical dimensions (CD), and enhancing microscopic resolution under atmospheric conditions. 
+          Upon completing my master's degree, I am scheduled to join Samsung Electronics through the S-EPSS recruitment track.
+
+
         </Paragraph>
         <Box align="center" my={4}>
           <Button
@@ -137,7 +140,9 @@ const Home = () => {
         </Heading>
         <BioSection>
           <BioYear>2025</BioYear>
-          Graduated in Feb 2025 from Automotive Engineering, Hanyang University.
+          Joined in 2025 the master’s program in Chemistry at KAIST.
+
+          Graduated in Aug 2025 from Chemistry, Hanyang University.
         </BioSection>
       </Section>
       <Section delay={0.3}>
@@ -179,7 +184,7 @@ const Home = () => {
             </Link>
           </ListItem>
           <ListItem>
-            <Link href="mailto: canwooj@gmail.com" target="_blank">
+            <Link href="mailto: junwon6937@gmail.com" target="_blank">
               <Button
                 variant="ghost"
                 colorScheme="teal"
@@ -191,13 +196,13 @@ const Home = () => {
           </ListItem>
          
           <ListItem>
-            <Link href="https://www.instagram.com/_is_jw?igsh=MTFna2U2bGh5aHZr&utm_source=qr" target="_blank">
+            <Link href="https://www.instagram.com/laffkw/" target="_blank">
               <Button
                 variant="ghost"
                 colorScheme="teal"
                 leftIcon={<IoLogoInstagram />}
               >
-                @_is_jw
+                @_laffkw
               </Button>
             </Link>
           </ListItem>
@@ -210,13 +215,34 @@ const Home = () => {
         </Heading>
         <BioSection>
           <BioYear>2019</BioYear>
-          Boin High School
+          Gangseo High School
+        </BioSection>
+
+        <BioSection>
+          <BioYear>2021</BioYear>
+          Second year completion, Sejong University, Dept. of Chemistry
         </BioSection>
         <BioSection>
           <BioYear>2025</BioYear>
-          B.S., Hanyang University, Dept. of Automotive Engineering
+          B.S., Hanyang University, Dept. of Chemistry(Summa Cum Laude)
         </BioSection>
         
+      </Section>
+
+      <Section delay={0.2}>
+        <Heading as="h3" variant="section-title">
+          AWARDS AND HONORS
+        </Heading>
+        <BioSection>
+          <BioYear>Feb. 2025</BioYear>
+          Question-Based-Learning Competition-Excellence Award, Hanyang university
+        </BioSection>
+
+        <BioSection>
+          <BioYear>Feb. 2024</BioYear>
+          Merit Based Scholarship, Hanyang university
+        </BioSection>
+
       </Section>
 
       <Section delay={0.2}>
@@ -225,19 +251,21 @@ const Home = () => {
       </Heading>
       
       <BioSection>
-        <BioYear>2023.08 – 2024.10</BioYear>
-        Undergraduate Researcher, Intelligent Robotics & Computer Vision Lab
+        <BioYear>2023.07 – 2023.09</BioYear>
+        Undergraduate Researcher, Super-resolution Spectroscopic Microscopy Lab
       </BioSection>
 
       <BioSection>
-        <BioYear>2021.04 – 2022.01</BioYear>
-        Squad Leader, ROK Army, (Logistics Command)
+        <BioYear>2024.07 – 2024.09</BioYear>
+        Long-term training program at Device Solutions, Samsung Electronics
       </BioSection>
 
       <BioSection>
-        <BioYear>2019.02 – 2020.07</BioYear>
-        Autory Automotive Club, Sejong University
+        <BioYear>2024.07 – 2024.09</BioYear>
+        Undergraduate Researcher, Nanohybrid Thin-Film Lab
       </BioSection>
+
+ 
     </Section>
 
       <Box align="center" h="5em">
